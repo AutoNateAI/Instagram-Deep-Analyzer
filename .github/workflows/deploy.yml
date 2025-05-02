@@ -1,0 +1,30 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Set this to your default branch name
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      # If you need to build or process files before deployment (not needed for this static site)
+      # Add build steps here if necessary
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: .  # The folder containing the built website (current directory)
+          branch: gh-pages  # The branch to deploy to
+          clean: true  # Automatically remove deleted files from the deployment branch
+          clean-exclude: |
+            .gitignore
+            .nojekyll
+          commit-message: "Deployed website [skip ci]"
+          single-commit: true  # Keep gh-pages branch history clean
