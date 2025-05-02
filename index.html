@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram Market Attention Analysis</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="chart-constraints.css">
+  <!-- JavaScript libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+  <div class="container-fluid">
+    <header class="my-4 text-center">
+      <h1>Instagram Market Attention Analysis</h1>
+      <p class="lead">Analyzing engagement patterns and audience focus for targeted meme creation</p>
+    </header>
+
+    <div class="row mb-4" id="upload-section">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h2>Upload Instagram Data</h2>
+          </div>
+          <div class="card-body">
+            <p>Upload your Instagram JSON data file to begin analysis.</p>
+            <div class="mb-3">
+              <input class="form-control" type="file" id="json-file-input" accept=".json">
+            </div>
+            <button id="analyze-button" class="btn btn-primary" disabled>Analyze Data</button>
+            <div class="alert alert-info mt-3" id="upload-info" role="alert">
+              Select a JSON file to begin analysis.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="dashboard-content" class="d-none">
+
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2>Dashboard Overview</h2>
+            <button id="export-pdf" class="btn btn-primary"><i class="bi bi-download"></i> Export to PDF</button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3">
+                <div class="metric-card">
+                  <h3>Total Posts</h3>
+                  <div id="total-posts" class="metric-value">--</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="metric-card">
+                  <h3>Total Comments</h3>
+                  <div id="total-comments" class="metric-value">--</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="metric-card">
+                  <h3>Avg Comments/Post</h3>
+                  <div id="avg-comments" class="metric-value">--</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="metric-card">
+                  <h3>Total Likes</h3>
+                  <div id="total-likes" class="metric-value">--</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <h2>Comment Volume by Post Type</h2>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="position: relative; height:400px; width:100%">
+              <canvas id="comment-by-type-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <h2>Engagement Timeline</h2>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="position: relative; height:400px; width:100%">
+              <canvas id="engagement-timeline-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <h2>Top Hashtags</h2>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="position: relative; height:400px; width:100%">
+              <canvas id="hashtag-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <h2>Comments vs Likes Correlation</h2>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="position: relative; height:400px; width:100%">
+              <canvas id="correlation-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h2>Interactive Post Explorer</h2>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="post-filter" class="form-label">Filter by:</label>
+              <div class="d-flex">
+                <select id="post-filter" class="form-select me-2">
+                  <option value="all">All Posts</option>
+                  <option value="comments">Most Comments</option>
+                  <option value="likes">Most Likes</option>
+                  <option value="recent">Most Recent</option>
+                </select>
+                <button id="apply-filter" class="btn btn-primary">Apply</button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table id="posts-table" class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Post Type</th>
+                    <th>Caption</th>
+                    <th>Comments</th>
+                    <th>Likes</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="posts-table-body">
+                  <!-- Will be populated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <div id="table-info" class="text-muted"></div>
+              <div class="pagination-controls">
+                <button id="prev-page" class="btn btn-sm btn-outline-primary">Previous</button>
+                <span id="page-info" class="mx-2">Page 1</span>
+                <button id="next-page" class="btn btn-sm btn-outline-primary">Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h2>Post Detail View</h2>
+          </div>
+          <div class="card-body">
+            <div id="post-detail" class="d-none">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="post-info">
+                    <h3 id="detail-caption"></h3>
+                    <p><strong>Type:</strong> <span id="detail-type"></span></p>
+                    <p><strong>Comments:</strong> <span id="detail-comments"></span></p>
+                    <p><strong>Likes:</strong> <span id="detail-likes"></span></p>
+                    <p><strong>Date:</strong> <span id="detail-date"></span></p>
+                    <p><strong>Hashtags:</strong> <span id="detail-hashtags"></span></p>
+                    <p><strong>URL:</strong> <a id="detail-url" href="#" target="_blank"></a></p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div id="comments-container">
+                    <h4>Top Comments</h4>
+                    <div id="comments-list" class="comments-list">
+                      <!-- Will be populated by JavaScript -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="no-post-selected" class="text-center py-5">
+              <p class="text-muted">Select a post from the table above to view details</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h2>AI-Generated Meme Prompts</h2>
+          </div>
+          <div class="card-body">
+            <p>Based on the analyzed data, here are 12 meme prompts designed to engage with the target audience:</p>
+            <div class="row" id="meme-prompts-container">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for viewing a meme prompt in detail -->
+  <div class="modal fade" id="meme-modal" tabindex="-1" aria-labelledby="memeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="memeModalLabel">Meme Prompt</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="meme-modal-content"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="copy-prompt">Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Load globals first -->
+  <script src="globals.js"></script>
+  <!-- Ensure script loading order for proper dependency management -->
+  <script src="meme-generator.js"></script>
+  <script src="util.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

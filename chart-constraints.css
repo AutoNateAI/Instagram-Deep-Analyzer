@@ -1,0 +1,37 @@
+/* Additional chart constraints to prevent indefinite growth */
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
+  max-height: 400px !important;
+  overflow: hidden;
+}
+
+/* Ensure chart canvases stay within their containers */
+canvas {
+  max-height: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Prevent cards from growing indefinitely */
+.card {
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-body {
+  flex: 1;
+  overflow: auto;
+  max-height: 500px;
+}
+
+/* Fix for specific chart types */
+#comment-by-type-chart,
+#engagement-timeline-chart,
+#hashtag-chart,
+#correlation-chart {
+  height: 100% !important;
+  width: 100% !important;
+}
